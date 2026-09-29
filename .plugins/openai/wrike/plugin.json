@@ -1,0 +1,30 @@
+{
+  "name": "wrike",
+  "version": "0.2.0",
+  "description": "Skills for working with Wrike projects, meetings, risks, whiteboards, etc.",
+  "author": {
+    "name": "Wrike",
+    "url": "https://www.wrike.com"
+  },
+  "homepage": "https://www.wrike.com",
+  "repository": "https://github.com/wrike/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "wrike",
+    "productivity",
+    "project-management"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Wrike",
+    "shortDescription": "Work with projects, meetings, and tasks in Wrike.",
+    "longDescription": "Use Wrike skills to turn meetings into work, manage projects and risks, organize intake, and coordinate collaborative planning.",
+    "developerName": "Wrike",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://www.wrike.com"
+  }
+}
