@@ -47,11 +47,13 @@ cp -r skills/wrike-meeting-sync ~/.codex/skills/
 
 ## Skills
 
+<!-- skills:start -->
 | Skill | Status | Useful for |
 |---|---|---|
 | `wrike-meeting-sync` | Available | Turn meeting transcripts into clear notes and actionable Wrike updates. Capture decisions and action items, connect them to relevant Wrike work, and keep owners, dates, statuses, and details up to date. |
 | `wrike-work-intake` | Coming soon | Turn ideas, briefs, and documents into ready-to-go Wrike work. Find and use relevant request forms and blueprints when available, or create the right work structure from scratch. |
 | `wrike-risk-report` | Coming soon | Identify and assess risks across Wrike projects, programs, and portfolios. Surface threats and dependencies, suggest mitigation options, and keep risk registers current as plans change. |
+<!-- skills:end -->
 
 ## How it works
 
