@@ -1,0 +1,20 @@
+{
+  "name": "wrike-skills",
+  "interface": {
+    "displayName": "Wrike"
+  },
+  "plugins": [
+    {
+      "name": "wrike",
+      "source": {
+        "source": "local",
+        "path": "./.plugins/openai/wrike"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
