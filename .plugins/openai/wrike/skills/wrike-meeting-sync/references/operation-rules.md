@@ -52,9 +52,9 @@ Read this before executing any approved row. It defines exactly how each operati
 One approval may authorize multiple rows. Execute approved rows sequentially or in dependency order, revalidating and verifying each row as you go.
 
 - Create a parent before any approved child rows that depend on it.
-- Skip dependent rows when their prerequisite fails or is uncertain.
+- Skip dependent rows when their prerequisite fails or is uncertain; report them as `Skipped`.
 - Continue after independent `Conflict` or definite `Failed` rows.
-- Stop remaining execution after an `Uncertain` result, and never retry an uncertain mutation automatically.
+- Stop remaining execution after an `Uncertain` result, and never retry an uncertain mutation automatically. Report approved rows that were not attempted as `Pending`.
 
 Bulk approval is not an atomic transaction; partial success is possible, so the results table is how the user learns exactly what landed.
 
@@ -62,7 +62,7 @@ Bulk approval is not an atomic transaction; partial success is possible, so the 
 
 Report every selected row:
 
-| Row | Result | Wrike item | Observation |
-|---|---|---|---|
+| Row | Signal | Result | Wrike item | Observation |
+|---|---|---|---|---|
 
-Use one of `Applied`, `No change`, `Conflict`, `Failed`, `Uncertain`, `Skipped`, or `Pending`. Re-read created or updated items and comments before reporting `Applied`, so the status reflects verified Wrike state rather than an assumed success.
+Use one of `Applied`, `No change`, `Conflict`, `Failed`, `Uncertain`, `Skipped`, or `Pending`. After every successful mutation, make a separate read call for the created or updated item or its comments and compare the returned state with the approved change before reporting `Applied`. The mutation tool's own response is not this verification read. If the separate read fails or does not show the approved state, do not report `Applied`; report `Uncertain` and stop remaining execution.

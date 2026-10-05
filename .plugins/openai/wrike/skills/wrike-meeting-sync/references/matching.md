@@ -1,147 +1,114 @@
 # Matching Meeting Notes to Wrike
 
-Match the polished meeting notes to Wrike tasks, projects, and folders. The notes are the only source for what happened in the meeting; Wrike is the source for current work state. Do not use the raw transcript or infer facts that are missing from the notes.
+Match the polished notes to Wrike without changing anything. The notes define what happened; Wrike defines what already exists and its current state.
 
-Matching is read-only. It inspects Wrike and prepares proposals, but it never creates, comments on, or updates anything. Applying approved changes happens later in the workflow (see `operation-rules.md`).
+## Closed input
 
-## Requirements
+The Signals table is the complete input. Resolve every signal exactly once and add none. If one row contains two independent deliverables, re-extract the notes instead of splitting it here. If there is no Signals table, report that the notes support no Wrike actions and stop.
 
-A Wrike MCP connector must be connected so you can search and read items. Use the connected Wrike tools (for example `Wrike:search_tasks`, `Wrike:search_folder_project`, `Wrike:get_task`, `Wrike:get_folder`, `Wrike:get_contacts`, `Wrike:get_workflows` — match the actual tool names your connector exposes) to read state. If no Wrike connector is available, say so and stop; do not guess at Wrike contents.
+Read and report the connected Wrike user first. If no Wrike connector is available, stop rather than guessing.
 
-## Find relevant work
+## Resolve each signal in this order
 
-- Read and report the connected Wrike user first, so the user knows whose account is in scope.
-- Identify the narrowest relevant space, project, or folder, and scope searches to it whenever possible.
-- Resolve explicit Wrike links or item IDs first. If the notes quote a Wrike title or say they found or opened an existing item, search that title first (close-title) and inspect that hit before any broader keyword search. That item is identity even if it is old, deferred, or from a prior year. Otherwise derive distinctive search terms from the notes — the project, product, client, or initiative named around each action item.
-- Search projects and folders as **two separate calls** (`project: true` and `project: false`). They are different queries; a single search will miss one kind.
-- Use a task search when a mentioned work item may be a task-based custom type (Campaign, User Story, etc.), and inspect its parents for destination context.
-- Inspect plausible items before proposing an action — check title, type, parent, status, people, dates, description, custom fields, and permalink as relevant.
-- Same owner, same `[DS]`/`[BE]` prefix, or the same parent epic is not a match. The title's distinctive nouns must match the deliverable (analyze results is not identify use-case examples; ranking unification is not a shipped boost). A Completed item that holds a related artifact (spreadsheet, examples) is not the home for new hypotheses or next-step work on a different active item.
-- Treat an explicit ID as item identity, not as proof that a change is supported by the notes.
-- Never invent owners, dates, statuses, field values, or outcomes.
+### 1. Find existing work before choosing an action
 
-### Choosing a destination (do not guess)
+Search is mandatory before every proposed creation.
 
-Prefer a destination only when its title, hierarchy, description, and the notes' context make it **clearly more relevant** than the alternatives. Do not choose a destination merely because it has a keyword match — a shared keyword is not a match.
+1. Resolve explicit Wrike links, IDs, quoted titles, and items the speakers found or opened during the call first. A named item remains the identity even when completed, cancelled, deferred, or old.
+2. Search the deliverable’s distinctive nouns and object, not generic verbs such as “create,” “review,” or “discuss.” Run a close-title search and a broader intent/synonym search across active, deferred, completed, and cancelled tasks. For a multi-step outcome, search its independently meaningful components so an existing component cannot be hidden inside a larger new proposal.
+3. Search projects and folders separately when looking for a destination. If the commitment names an agenda or list, search for that exact list in the relevant team's planning hierarchy. Inspect plausible hits and their parents, descriptions, people, dates, and status.
+4. Inspect plausible meeting-notes or MoM items. An Active record counts only when deliberately maintained as a live tracker and its exact action row has an owner and state; when it tracks an event, later decisions about the event's recording, slides, or roles update that tracker rather than create component tasks. A Completed record never does: a row state or checkbox does not override completion. Its row blocks creation only when it links a dedicated work item.
 
-If, for a given action item, there is **no credible destination** or **more than one credible destination**, do not pick one. Put the item under **Needs your input** with up to three candidate names and permalinks and ask the user to choose. Different action items may belong in different destinations.
+A clear same-deliverable hit wins over a new item even if its wording differs, the meeting adds details or next steps, its status is Completed or Cancelled, or a speaker believed no ticket existed. Compare the exact object, change, prerequisite, and verification: a related completed operation or an empty task named for the artifact is not proof that the promised work is tracked. Add new activity to a genuine match. A broad project description or unowned checklist describing a topic is not proof that the specific owner–deliverable is tracked. A related parent is not a duplicate of a genuinely different child deliverable.
 
-Before concluding that two candidates are equally credible, separate them on these signals, in order:
+### 2. Choose the disposition
 
-1. **People** — a project whose assignees, owner, or author include the action's owner, or the people in the meeting, beats one that does not.
-2. **Scope** — a project whose title and description describe the workstream the action belongs to beats a folder that merely contains related items.
-3. **State** — a project the team is actively delivering beats a dormant, completed, or archived one. Use this only when choosing a **parent for new work**. Do not skip an item the notes already named or opened because it looks stale.
-4. **Siblings** — a parent that already holds comparable work from this workstream beats an empty or unrelated one.
+| Signal type | Allowed disposition |
+|---|---|
+| `commitment` | Update/assign the same existing work; otherwise create only after the safe-create gate below |
+| `decision` | Update the affected existing item’s description or field; comment only when no canonical field fits; never create |
+| `status` | Update an exact item when its live status differs; otherwise Already represented; never create |
+| `date` | Update the exact item’s due date; never create |
+| `ownership` | Update the exact item’s people; never create |
+| `priority` | Update the exact item’s priority field; comment only if no such field exists; never create |
+| `open-question` | Needs your input unless an exact existing item should carry it; never create |
+| `non-action` | Not tracked, with the reason |
 
-Only when two candidates survive all four as genuine equals is the item **Needs your input**. "I could not decide quickly" is not the same as "the meeting does not say."
+For an existing item, compare canonical fields rather than relying on comments. If Wrike reflects the exact signal, use **Already represented / no action needed**; otherwise prepare an update. An accepted investigation or unblock step absent from the item is new content: comment its owner, action, and due date on the exact blocked item rather than making it optional. Do not create a sibling or child merely to record context about an existing item.
+When an existing item takes a dated commitment, propose changing its due-date field if the current due date differs. Mentioning the deadline only in a comment does not update the commitment.
 
-Never create under an item whose status category is Completed or Cancelled, even when the notes point straight at it. Walk up to its parent project or epic, use that as the parent, and say in the preview that you did and why.
+When a commitment only advances an existing research or decision item, update that item. A separately accepted substantive session, findings handoff, or agenda placement is distinct when the existing item tracks the subject but not the promised event or slot; search for that event before creating it.
 
-Creating a **child** under a project or folder is not a duplicate of that parent. The parent is the destination; the child is new work. Do not skip a create because the destination project already exists.
+### 3. Safe-create gate for commitments
 
-When the notes name a destination kind — To Discuss, next planning, agenda, backlog — prefer the sibling folder or custom item whose title matches that kind over a generic Action Items / tasks folder.
+A commitment may appear as a Ready Create only when all four answers are yes:
 
-If **every** action item in a meeting lands under **Needs your input**, treat that as evidence you have under-searched rather than as an answer. Before showing that preview, name the strongest candidate you found for each item and state what specifically disqualified it.
+1. **Task-worthy:** it is a discrete durable deliverable, not mere coordination, administration, a status report, an idea, or work already done. A substantive session, formal findings share, measurement, adoption tracking, or agenda placement passes this test when explicitly accepted.
+2. **Owned:** the notes name the person who accepted it, and that name resolves to one Wrike user. A concrete assignment to an absent person remains Needs your input until confirmed.
+3. **New:** the duplicate searches found no item, action row, or checklist entry that already represents it.
+4. **Placed:** one exact active parent is clearly supported by the workstream or meeting context.
 
-## Cover every action item
+If ownership, novelty, or placement is uncertain, put the signal under **Needs your input** and show the best candidates. Do not make a Ready Create “for completeness.”
 
-Account for every action item in the meeting notes. Do not silently omit one. Give each action exactly one visible outcome:
+### 4. Choose a parent without guessing
 
-- update an existing Wrike item;
-- create a new Task, Project, or Folder;
-- **Already represented / no action needed**;
-- **Needs your input**;
-- **Not tracked**, with a short reason.
+Search for parents separately from duplicates, using the deliverable's domain and function as well as product nouns; expand organizational abbreviations. Check for a dedicated container matching the owner's functional work before treating a meeting-series project as the destination. Rank candidates:
 
-**Not tracked** is only for work the notes say will not be filed in Wrike (personal, courtesy, explicitly parked with no ticket). An explicit commitment with an owner is never Not tracked. If the destination is unclear, that is **Needs your input**, not Not tracked. External outreach, vendor calls, and architecture validation with a named owner are tracked unless the notes say otherwise.
+1. an active destination explicitly named in the transcript, including purpose folders such as `To Discuss` or `Backlog`;
+2. a dedicated active domain or operations container matching the deliverable;
+3. the closest active project or epic parent of the exact item discussed in the meeting;
+4. the meeting's broader workstream or series.
 
-Prefer structured Wrike work over comments, because a comment is easy to miss and does not drive Wrike's own reporting:
+A MoM's location is provenance, not a default destination. Material to be shared is context, not automatically the parent of a handoff task. Dates and “this sprint” are schedule, not placement. Prefer a durable domain project over a sprint folder unless speakers explicitly place the work there. Same owner, a shared prefix, or one keyword is not proof of fit.
 
-1. Update canonical fields on an exact existing item when appropriate: status, people, dates, description, or custom fields.
-2. Create a new item when the notes contain explicit work and no suitable item exists.
-3. Use comments to preserve rationale, decisions, or meeting context.
+If the referenced item is Completed or Cancelled and is itself the same deliverable, use Already represented or update it. If it is only context for different new work, walk up to its active project or epic. Never create under a Completed or Cancelled parent.
 
-**A comment is never the whole answer for an action item that has a deliverable.** If the action names something a person will produce, change, or decide, a comment alone does not represent it. Only a purely informational item — context with no deliverable and no owner — may be represented by a comment alone. If the notes name an owner with a deliverable and no existing item is that work, create or update assigned to that owner. A comment on a nearby ticket, owned by the connected or facilitator user, is not enough.
+When several candidates remain, compare people, scope, active state, and similar siblings. If none is clearly best after those checks, use Needs your input with at most three names and permalinks. Different signals may have different destinations.
 
-**This is not a licence to create.** Work down this ladder and stop at the first rung that fits:
+## Supported updates
 
-1. The work already exists in Wrike → **Already represented**. Name the item and stop.
-2. An exact existing item should carry it → **update** its canonical fields. Recording a decision, a scope, an agreed priority, or a set of hypotheses belongs in that item's description or custom fields, not only in a comment.
-3. Nothing represents it and the notes carry an explicit commitment → **create**, and only after the duplicate search below comes back empty.
-
-Replacing a comment with a task you did not duplicate-search is a worse error than the comment was. An existing comment that mentions an owner, status, or date does not prove the corresponding Wrike fields are populated — inspect those fields and propose updates when they do not reflect the notes.
-
-When one action item contains distinct work with different owners, timing, or dependencies, prepare separate proposals when that creates clearer accountability.
-
-## Check for existing work before creating
-
-Before proposing to create anything, search the resolved parent for work that already represents the action. "No visible match" alone is not permission to create — the notes must contain an explicit action or creation decision. A restated commitment in the notes (unchanged since a prior meeting, already a task, recap of a decided date) is not a creation decision.
-
-Run a real duplicate search, not a single glance:
-
-- Search **active and deferred** items using the deliverable's distinctive nouns and verbs.
-- Run a close-title search first and, when needed, one broader keyword search.
-- A meeting-notes / MoM / minutes item is the meeting record, not the work. It is a duplicate only when that item *is* the deliverable (same title/gist as the commitment). Listing an owner, action, and date in MoM does not mean the work already exists — create or update the real item under the destination project.
-- Compare title, description, assignees, and status. A shared keyword alone is not a duplicate.
-
-Then branch on the result:
-
-- **Clear match** — report the action as **Already represented**, linking the existing item; do not create a duplicate. Continuing, refining, or sequencing work that already has a Wrike item is an **update** of that item, not a create. If the notes named or opened an existing title, that item is the clear match: update it with the agreed next step. "I'll file this / drop it in chat" after finding it is that update, not a create. A MoM row that merely records the commitment is not a clear match.
-- **Ambiguous match** — put it under **Needs your input** with the candidate(s) linked, and state the single decision needed.
-- **Failed or unavailable search** — disclose it in the preview; never treat a failed search as a silent "no duplicate."
-
-## Prepare supported actions
-
-Prepare read-only proposals for: comments and due dates; creating standard Tasks, Projects, or Folders; status changes, including completing or cancelling tasks; adding or removing task assignees or project owners; description edits; and custom-field changes.
-
-- **Dates** — the Wrike due-date field is exactly one token: `YYYY-MM-DD` or `none`. If the notes Due is already ISO, copy it. If the notes say "today", "this afternoon", "by end of day", or leave Due as `today`, write `meeting_date`. If a weekday and a day-of-month disagree, use the weekday's ISO from the Date map. Never leave "today" in the field, and do not substitute a nearby Friday.
-- **Creation** — resolve the exact parent (per "Choosing a destination") and run the duplicate search above first.
-- **Statuses** — inspect the relevant workflow and resolve the exact standard or custom status. Do not guess from a display label.
-- **People** — the owner is who accepted the work, not who requested it and not who last mentioned it. "I'll create / file / drop it in chat" from the facilitator is filing, not ownership — assign the Ready row to whoever accepted the deliverable. Resolve that name to a unique Wrike user ID. If more than one person matches, put the proposal under **Needs your input**.
-- **Descriptions** — fetch the full current description. Never prepare an edit from truncated content.
-- **Custom fields** — resolve the field ID and type, and inspect allowed options when applicable. Clearing a field must be explicit.
+- **Dates:** copy the signal’s ISO Due exactly. `none` means set no due date. Never borrow a nearby date from the Date map or another signal.
+- **People:** use the accepter from `Who`, not the requester, facilitator, or connected user. Map transcript labels such as `Me` to a participant, then resolve one active Wrike user. Use the connector's exact display name and ID everywhere, including Needs-input proposals; transcript spelling alone is unresolved. If search is ambiguous, keep the owner unresolved. Change existing assignees only for an ownership signal.
+- **Statuses:** inspect the item’s workflow and resolve an exact status ID.
+- **Descriptions:** fetch the complete description and preview the full replacement or an exact diff.
+- **Custom fields:** resolve the field ID, type, and allowed value. Clear only when explicit.
+- **Comments:** use only for information that belongs on an exact item but has no canonical field. A comment is never enough for a commitment whose work is absent.
 
 ## Preview
 
-Group proposals into the sections below.
+Give every signal exactly one visible outcome in these sections:
 
-### Ready to apply
+1. **Ready to apply** — fully resolved update or safe creation.
+2. **Needs your input** — one missing choice, with candidates and the precise question.
+3. **Already represented / no action needed** — name and link the evidence.
+4. **Not tracked** — only explicit `non-action` signals.
 
-Use a compact table:
+Show all four sections; write `None` under an empty one.
 
-| Row | Action | Wrike item | Change |
-|---|---|---|---|
+Use this Ready table:
 
-- Use stable row labels such as `M1`, `M2`, `M3` for the current preview. Each row is one operation.
-- Existing-item actions must identify an exact item and include its canonical ID and permalink.
-- Creation actions must identify the exact parent and item type.
-- Keep the Change cell short, such as `Active → Completed`, `Sam → Alex`, or `Add comment`.
-- Do not dump full comments or descriptions into the table.
+| Row | Signal | Action | Wrike item | Change | Basis |
+|---|---|---|---|---|---|
 
-Show detailed content only below the table when needed: the exact comment body (before any signature the apply step adds); a description diff or complete before/after text; a new item's title, parent, description, people, status, and dates; custom-field name with human-readable old/new values; and an inline note such as `Runs after M1` when an operation depends on a prior creation.
+- Label operations `M1`, `M2`, … and include one signal ID per row.
+- Existing-item actions include the exact ID and permalink.
+- Creations include title, item type, active parent, assignee, status, and due date.
+- Show complete comment text and description changes below the table.
+- A Ready row must have every required ID and value resolved.
+- **Basis** — the signal’s Evidence quote and why this item or parent is the right target.
 
-A proposal belongs under **Ready to apply** only when the exact target or parent, required IDs, valid values, duplicate checks, and complete preview content are all resolved.
+Before showing the preview, audit every Ready Create:
 
-Before showing the preview, re-read your own Ready rows and check each one:
+- Does the transcript contain direct acceptance by the named owner?
+- Did both close-title and broader duplicate searches run across all states?
+- Did an MoM action row or checklist already record the same owner and deliverable?
+- Is the chosen parent an active domain project rather than an incidental sprint or completed item?
+- Is Due copied from that signal, including `none`?
 
-- Any row whose only operation is `Add comment` — name the deliverable it records and why no field change applies, or convert it into the create or update it should have been.
-- Any Add-comment-only row whose notes name an owner other than the connected user — convert to create or update assigned to that owner.
-- Any Ready row that updates item A while the notes name a different existing title — retarget to the named item.
-- Any row creating under a Completed or Cancelled parent — re-parent it.
-- Any action item with a named owner and a deliverable that is not represented by a Ready row — say which of the other three sections it went to, and why.
-- Any Create row for work a duplicate search would have found — that is an **Already represented**, not a create. Re-run the search before keeping it. A MoM / meeting-notes item that only lists the commitment does not count.
-- Any Ready row whose due is `today`, empty, or `none` while the notes named today / this afternoon — set due to `meeting_date`.
+Move any row that fails an audit question to Already represented or Needs your input.
 
-### Needs your input
+Finish with a conservation line that lists every signal exactly once:
 
-List proposals that need one clarification — an ambiguous person, target, parent, status, field, value, destination, or duplicate. State the single decision needed, and link up to three candidates when a choice of destination or item is involved. Do not create a row that looks ready when required information is missing.
-
-### Already represented / no action needed
-
-List action items that require no Wrike change, and identify the item or evidence that already represents the work. Check canonical fields rather than relying on a comment alone.
-
-### Not tracked
-
-List any action intentionally not represented in Wrike, with the reason. External outreach, vendor calls, and architecture validation with a named owner are tracked unless the notes say otherwise.
-
-Every action item must appear under exactly one of these four sections. If the notes support no Wrike actions, say so plainly.
+```text
+S1–S4 → Ready S2 · Needs input S1 · Already represented S3 · Not tracked S4
+```

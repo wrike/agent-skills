@@ -1,23 +1,20 @@
 ---
 name: wrike-meeting-sync
 description: >-
-  Turn a meeting transcript into approved Wrike updates, end to end. Extract terse factual
-  Markdown notes from a transcript, match every action item to existing or new Wrike work,
-  preview the proposed changes, and apply only the ones the user approves — creation,
-  statuses, assignees, dates, descriptions, custom fields, and comments. Use whenever the
-  user wants meeting notes from a transcript, recording text, or a Granola/Otter/Zoom
-  export; wants meeting action items found and matched in Wrike; or says things like "sync
-  this meeting to Wrike" or "update my tasks from these notes." Notes-only requests are
-  handled too: with no Wrike connector, or when the user only wants notes, it produces the
-  notes and stops. Nothing is written to Wrike without explicit approval.
+  Turn a meeting transcript into factual Markdown notes and approved Wrike updates.
+  Extract task-worthy commitments and changes to identifiable work, match them to existing
+  Wrike items before proposing creation, preview every change, and apply only what the
+  user approves. Use for meeting transcripts, Granola/Otter/Zoom exports, meeting notes,
+  or requests to sync meeting outcomes to Wrike. Notes-only requests work without a Wrike
+  connector. Nothing is written to Wrike without explicit approval.
 license: MIT
 metadata:
-  version: 2026.9.25
+  version: 2026.10.5
 ---
 
 # Wrike Meeting Sync
 
-Turn a meeting transcript into approved Wrike updates. Extract notes, match every action item to Wrike, preview the changes, and apply only what the user explicitly approves. This one skill covers the whole workflow; the detailed rules for each phase live in `references/`.
+Turn a meeting transcript into approved Wrike updates. Extract notes, resolve each task-worthy signal, preview proposed changes and intentional non-actions, and apply only what the user explicitly approves.
 
 ## Run it in the main agent
 
@@ -29,19 +26,21 @@ A Wrike MCP connector must be connected for matching and mutations. Extraction w
 
 ## Workflow
 
-1. **Extract** — turn the transcript into polished Markdown notes. Follow `references/notes-extraction.md`. Show the notes to the user.
-2. **Match** — match the polished notes (never the raw transcript) to existing or new Wrike work, read-only. Follow `references/matching.md`.
-3. **Preview** — show the matcher's **Ready to apply** and **Needs your input** sections.
+1. **Extract** — read `references/notes-extraction.md`, then turn the transcript into polished Markdown notes. End with its closed Signals table when task-worthy signals exist; if the transcript has accepted work but the draft has no table, redo extraction before matching. Show the notes to the user.
+2. **Match** — resolve every signal from the polished notes (never the raw transcript) to existing or new Wrike work, read-only. Follow `references/matching.md`.
+3. **Preview** — show all four matcher outcomes: **Ready to apply**, **Needs your input**, **Already represented / no action needed**, and **Not tracked**, followed by the conservation line accounting for every signal exactly once. This lets the user audit both proposed changes and intentional non-actions.
 4. **Approve** — do not change Wrike until the user approves one or more visible Ready rows.
 5. **Apply** — execute approved rows with preflight re-verification. Follow `references/operation-rules.md`.
 
 If the notes change, rerun matching and show a fresh preview. If required information is absent from both the notes and Wrike, leave it unresolved rather than inferring it from the transcript.
 
+New-item precision is the critical invariant: search for the same deliverable in all states and in meeting-action records, then create only when the commitment has a directly accepted owner, no existing representation, and one clearly supported active parent. Otherwise use an existing item, Already represented, or Needs your input.
+
 ### Early exits
 
-- **Notes only** — if the user only wants notes, produce them (step 1) and stop.
+- **Notes only** — if the user only wants notes, produce them (step 1, Extract) and stop.
 - **No connector** — run extraction only and tell the user the Wrike steps need a connected Wrike plugin.
-- **Preview only** — if the user asks to see the matches without changing Wrike, run steps 1–3 and stop; do not proceed to approval or apply.
+- **Preview only** — if the user asks to see the matches without changing Wrike, run steps 1–3 (Extract, Match, Preview) and stop; do not proceed to approval or apply.
 
 ## Supported actions
 
@@ -70,7 +69,7 @@ Approve all except M2
 By default, append a plain-text signature to every generated Wrike comment so readers know it was drafted by an assistant on the user's behalf:
 
 ```text
-— Drafted by Claude on behalf of {connected Wrike user name}
+— Drafted by AI on behalf of {connected Wrike user name}
 ```
 
 - Resolve the name from the connected Wrike user, not the transcript.
