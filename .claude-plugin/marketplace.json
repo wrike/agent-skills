@@ -13,7 +13,7 @@
       "source": "./",
       "displayName": "Wrike",
       "description": "Skills for working with Wrike projects, meetings, risks, whiteboards, etc.",
-      "version": "0.0.2",
+      "version": "0.0.4",
       "author": {
         "name": "Wrike"
       },
@@ -41,7 +41,8 @@
       ],
       "strict": false,
       "skills": [
-        "./skills/wrike-meeting-sync"
+        "./skills/wrike-meeting-sync",
+        "./skills/wrike-project-risk"
       ]
     }
   ]
