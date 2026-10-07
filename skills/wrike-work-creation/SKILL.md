@@ -27,7 +27,7 @@ compatibility: >-
   guessing. Uploading a file also needs a client that can PUT raw bytes to a signed URL
   outside the MCP.
 metadata:
-  version: 2026.9.30
+  version: 2026.10.7
 ---
 
 # Work creation: pick the route, then build
@@ -117,13 +117,15 @@ user adds mid-flow is input: apply it and carry on.
 
 Before a creation call that is part of the current workflow
 (`submit_requestform`, `create_item_from_blueprint`, `create_task_item`,
-`create_project_folder_item`, `add_attachments_to_item`), show one table of
-every value that call will send: names rather than IDs, each with its source
-(*from you*, *from <the file they shared>*, *assumed: <why>*, or *suggested by
-me*). Under the table, list the assumed values again, then any field you
-considered but are leaving empty, with the reason; those fields are not sent.
-For a blueprint, add that the launch creates a whole item tree that cannot be
-undone from here.
+`create_project_folder_item`, `add_attachments_to_item`), show every value
+that call will send as a list. Present each row as
+**Field** - Value (Source) for form fields and other creation values, or as
+**Setting** - Value (Source) for blueprint launch settings: names rather than
+IDs, each with its source (*from you*, *from <the file they shared>*,
+*assumed: <why>*, or *suggested by me*). Under the list, list the assumed
+values again, then any field you considered but are leaving empty, with the
+reason; those fields are not sent. For a blueprint, add that the launch
+creates a whole item tree that cannot be undone from here.
 
 Then stop. Make the call only after the user answers this preview with an
 explicit yes; the message that started the flow ("submit it") is not that yes,
@@ -204,18 +206,16 @@ Questions 3–4 of 4, from the Equipment page. VPN is already ticked, from your 
 </assistant>
 <user>MacBook Pro, she'll collect it</user>
 <assistant>
-This is what I'll submit to New hire equipment:
+This is what I'll submit to New hire equipment (represented as **Field** - Value (Source)):
 
-| Field | Value | Source |
-|---|---|---|
-| Full name | Lena Vogt | from you |
-| **Start date** | Monday 5 October 2026 | from you (confirmed) |
-| Office | Berlin | from you |
-| Department | Design | assumed: you said "product designer" |
-| Manager | Anna Schmidt | from offer-letter.pdf |
-| Laptop model | MacBook Pro 14-inch | from you |
-| Access needed | VPN | from you |
-| How should the equipment reach the new hire? | Collect at the office | from you |
+**Full name** - Lena Vogt (from you)
+**Start date** - Monday 5 October 2026 (from you (confirmed))
+**Office** - Berlin (from you)
+**Department** - Design (assumed: you said "product designer")
+**Manager** - Anna Schmidt (from offer-letter.pdf)
+**Laptop model** - MacBook Pro 14-inch (from you)
+**Access needed** - VPN (from you)
+**How should the equipment reach the new hire?** - Collect at the office (from you)
 
 **Assumed, not confirmed:** Department is Design, because you said "product designer".
 
@@ -236,7 +236,7 @@ Submitted: [New hire equipment: Lena Vogt](https://www.wrike.com/open.htm?id=441
 - The forms are named without links: `search_requestforms` returns an id but no URL, and the user gave none. The blueprint is linked with the `permalink` from its hit.
 - The page ids in the second `get_requestform` call come from the first call's `pageIndex`, for the pages on the path so far.
 - Questions came one form page per turn. The date was inferred and critical, so it was confirmed; Department was a confident inference, so it was marked assumed. Delivery was asked before the preview because it decides whether the Shipping page appears.
-- The table holds the 8 values that were sent. Cost centre was skipped, so it is listed under the table and not sent. Only the yes to the preview allowed the submit.
+- The preview list holds the 8 values that were sent, each as **Field** - Value (Source). Cost centre was skipped, so it is listed under the list and not sent. Only the yes to the preview allowed the submit.
 </explanation>
 </example>
 
@@ -271,15 +271,13 @@ Questions 1–3 of 3:
 </assistant>
 <user>That title's fine, and so is the date. Don't notify anyone yet. Oh, and add Priya as a follower.</user>
 <assistant>
-Followers can't be set from here, so Priya needs adding in Wrike after the launch. This is what I'll launch:
+Followers can't be set from here, so Priya needs adding in Wrike after the launch. This is what I'll launch (represented as **Setting** - Value (Source)):
 
-| Setting | Value | Source |
-|---|---|---|
-| Blueprint | [Client onboarding](https://www.wrike.com/open.htm?id=4102556710) | from you |
-| Title | Acme Robotics onboarding | from you |
-| **Destination** | Delivery space | from you |
-| **Schedule** | last task ends Friday 20 November 2026 | from you (confirmed) |
-| Notify assignees | No | from you |
+**Blueprint** - [Client onboarding](https://www.wrike.com/open.htm?id=4102556710) (from you)
+**Title** - Acme Robotics onboarding (from you)
+**Destination** - Delivery space (from you)
+**Schedule** - last task ends Friday 20 November 2026 (from you (confirmed))
+**Notify assignees** - No (from you)
 
 This creates the whole Client onboarding tree in Delivery, and it can't be undone from here. I can't see the blueprint's tasks; by default the launch copies their descriptions, assignees and custom fields, but not their attachments.
 

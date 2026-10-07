@@ -70,8 +70,9 @@ it does not belong.
 
 ## Show it before you create
 
-The preview rules in `SKILL.md` apply unchanged: one table, every value
-sourced, assumptions named. A structure adds three rules:
+The preview rules in `SKILL.md` apply unchanged: one list as
+**Field** - Value (Source), every value sourced, assumptions named. A
+structure adds three rules:
 
 - **Every deliverable traces to something**: the request asked for it, the
   account's convention always includes it, or the work cannot happen without

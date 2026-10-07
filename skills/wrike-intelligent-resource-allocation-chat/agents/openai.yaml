@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wrike Intelligent Resource Allocation — Chat"
+  short_description: "Assignee allocation dashboard in chat"
+  default_prompt: "Use $wrike-intelligent-resource-allocation-chat to recommend assignees for this Wrike project, folder, or selected tasks and automatically render the best available visual allocation dashboard here without asking about destination or format."

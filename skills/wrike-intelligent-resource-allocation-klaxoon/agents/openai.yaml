@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wrike Intelligent Resource Allocation — Klaxoon"
+  short_description: "Create and apply Wrike staffing boards"
+  default_prompt: "Use $wrike-intelligent-resource-allocation-klaxoon to create a verified Klaxoon staffing board or apply assignments from its current layout."

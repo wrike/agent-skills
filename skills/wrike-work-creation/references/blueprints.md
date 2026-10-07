@@ -42,10 +42,10 @@ Files the user wants on the new item are added after the launch. Follow
 
 ## Preview
 
-Use the preview table from `SKILL.md` with these rows: the blueprint (title and
-permalink), the root item title, the destination, whether assignees are
-notified, and every other setting you are sending. Name assignees only if you
-have read them.
+Use the preview list from `SKILL.md`, each row as **Setting** - Value (Source),
+with these settings: the blueprint (title and permalink), the root item title,
+the destination, whether assignees are notified, and every other setting you
+are sending. Name assignees only if you have read them.
 
 A search hit says nothing about the tree the launch will build. Say that the
 preview covers only the title and the settings you are sending, and do not

@@ -50,6 +50,8 @@ cp -r skills/wrike-meeting-sync ~/.codex/skills/
 <!-- skills:start -->
 | Skill | Useful for |
 |---|---|
+| `wrike-intelligent-resource-allocation-chat` |  |
+| `wrike-intelligent-resource-allocation-klaxoon` |  |
 | `wrike-meeting-sync` | Turn meeting transcripts into clear notes and actionable Wrike updates. Capture decisions and action items, connect them to relevant Wrike work, and keep owners, dates, statuses, and details up to date. |
 | `wrike-project-risk` | Identify and assess risks across your Wrike projects, programs, and portfolios. Surface threats, dependencies, and mitigation options, and keep risk registers up to date as plans change. |
 | `wrike-work-creation` | Turn ideas, briefs, and documents into ready-to-go Wrike work. Find and use relevant request forms and blueprints when available, or create the right work structure from scratch. |
