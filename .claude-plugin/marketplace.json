@@ -13,6 +13,7 @@
       "source": "./",
       "displayName": "Wrike",
       "description": "Skills for working with Wrike projects, meetings, risks, whiteboards, etc.",
+      "icon": "./icon.png",
       "version": "0.0.4",
       "author": {
         "name": "Wrike"
